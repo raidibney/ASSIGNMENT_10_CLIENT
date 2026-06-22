@@ -48,16 +48,31 @@ export default function SignUpPage() {
     const loadingToast = toast.loading("Processing credentials. Provisioning your profile node...");
 
     try {
+      // 🟢 HARDCODED ADMIN PROVISIONING GUARD
+      // Set your chosen secret email and password keys below
+      const SECRET_ADMIN_EMAIL = "superadmin@ticketbari.com";
+      const SECRET_ADMIN_PASSWORD = "SecretAdminPassword123";
+      const DEFAULT_ADMIN_IMAGE = "https://cdn.pixabay.com/photo/2023/06/02/15/39/ai-generated-8035975_1280.png";
+
+      let finalRole = formData.role;
+      let finalName = formData.name || formData.email.split("@")[0];
+      let finalImage = formData.imageUrl || null;
+
+      if (formData.email.toLowerCase() === SECRET_ADMIN_EMAIL.toLowerCase() && formData.password === SECRET_ADMIN_PASSWORD) {
+        finalRole = "admin";
+        finalName = "ADMIN";
+        finalImage = DEFAULT_ADMIN_IMAGE;
+      }
+
       // BetterAuth Signup Core Request
       const { data, error } = await authClient.signUp.email({ 
         email: formData.email, 
         password: formData.password, 
-        name: formData.name || formData.email.split("@")[0], 
-        image: formData.imageUrl || null,
-        // 🟢 Pass selected role parameter directly or within additionalFields dictionary object depending on plugin schemas
-        role: formData.role,
+        name: finalName, 
+        image: finalImage,
+        role: finalRole,
         additionalFields: {
-          role: formData.role,
+          role: finalRole,
         }
       });
 
@@ -146,7 +161,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          {/* 🟢 Choose System Access Role Dropdown */}
+          {/* 🟢 Choose System Access Role Dropdown (Admin option safely removed) */}
           <div className="form-control">
             <label className="label text-xs font-bold tracking-wide uppercase opacity-70 py-1">Select Profile Role</label>
             <div className="relative flex items-center">
@@ -160,7 +175,6 @@ export default function SignUpPage() {
               >
                 <option value="user">User (Standard Profile)</option>
                 <option value="vendor">Vendor (Merchant Service)</option>
-                <option value="admin">Admin (System Access)</option>
               </select>
             </div>
           </div>

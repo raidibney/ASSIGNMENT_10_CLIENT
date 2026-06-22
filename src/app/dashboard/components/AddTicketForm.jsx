@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { FaTicketAlt, FaCloudUploadAlt } from "react-icons/fa";
+import { FaTicketAlt } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AddTicketForm({ session }) {
   const [loading, setLoading] = useState(false);
@@ -35,16 +37,18 @@ export default function AddTicketForm({ session }) {
     e.preventDefault();
     setLoading(true);
 
-    // Filter checked items to form an array of active perks
     const selectedPerks = Object.keys(perks).filter(key => perks[key]);
 
     const payload = {
       ...formData,
-      perks: selectedPerks
+      perks: selectedPerks,
+      vendorName: session?.user?.name || "Anonymous Vendor",
+      vendorEmail: session?.user?.email || "vendor@gmail.com"
     };
 
     try {
-      const response = await fetch("/api/tickets", {
+      // 🟢 Updated Port context mapping to 7000
+      const response = await fetch("http://localhost:7000/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -53,16 +57,34 @@ export default function AddTicketForm({ session }) {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Ticket added successfully!");
-        // Reset state values
+        // 🚀 SUCCESS TOAST NOTIFICATION WITH APPROVAL EXPECTATION MESSAGE
+        toast.success("Ticket added successfully! Please wait for admin approval.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        });
+
+        // Reset Form Fields
         setFormData({ title: "", from: "", to: "", transportType: "", price: "", quantity: "", departureTime: "", imageUrl: "" });
         setPerks({ AC: false, WiFi: false, Food: false, TV: false, ChargingPort: false, Breakfast: false });
       } else {
-        alert(`Error: ${data.error}`);
+        // ❌ API HANDLED ERROR TOAST
+        toast.error(`Error: ${data.error || "Failed to create ticket item"}`, {
+          position: "top-right",
+          theme: "colored",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to submit form.");
+      // 💥 NETWORK / UNCAUGHT EXCEPTION TOAST
+      toast.error("Failed to submit form. Check your server connection node.", {
+        position: "top-right",
+        theme: "colored",
+      });
     } finally {
       setLoading(false);
     }
@@ -70,22 +92,21 @@ export default function AddTicketForm({ session }) {
 
   return (
     <div className="w-full max-w-2xl bg-base-100 border border-base-content/10 rounded-3xl p-8 shadow-xl mx-auto">
-      
-      {/* Title Header Matching image_08c71c.png */}
+      {/* 🔔 Toast Container configuration mapping */}
+      <ToastContainer />
+
       <div className="text-center mb-6 flex items-center justify-center gap-2">
         <FaTicketAlt size={22} className="text-teal-500" />
         <h2 className="text-2xl font-black text-teal-600 tracking-wide dark:text-teal-400">Add New Ticket</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Ticket Title */}
         <input 
           type="text" name="title" placeholder="Ticket Title" required
           value={formData.title} onChange={handleInputChange}
           className="input input-bordered w-full bg-base-200/50 rounded-xl focus:outline-teal-500 text-sm"
         />
 
-        {/* Origin and Destination Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input 
             type="text" name="from" placeholder="From (Location)" required
@@ -99,7 +120,6 @@ export default function AddTicketForm({ session }) {
           />
         </div>
 
-        {/* Transport Selector drop-down */}
         <select 
           name="transportType" required value={formData.transportType} onChange={handleInputChange}
           className="select select-bordered w-full bg-base-200/50 rounded-xl text-sm text-base-content/70"
@@ -111,7 +131,6 @@ export default function AddTicketForm({ session }) {
           <option value="Launch">Launch</option>
         </select>
 
-        {/* Price and Quantity Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input 
             type="number" name="price" placeholder="Price (per unit)" required min="1"
@@ -125,7 +144,6 @@ export default function AddTicketForm({ session }) {
           />
         </div>
 
-        {/* Departure Details */}
         <div>
           <label className="label text-xs font-bold uppercase tracking-wider text-base-content/60 px-1">Departure Date & Time</label>
           <input 
@@ -135,7 +153,6 @@ export default function AddTicketForm({ session }) {
           />
         </div>
 
-        {/* Perks Grid Layout */}
         <div>
           <label className="label text-xs font-bold uppercase tracking-wider text-base-content/60 px-1">Perks</label>
           <div className="grid grid-cols-2 gap-2 p-1">
@@ -151,19 +168,16 @@ export default function AddTicketForm({ session }) {
           </div>
         </div>
 
-        {/* Image Input field */}
         <input 
           type="url" name="imageUrl" placeholder="Image URL" value={formData.imageUrl} onChange={handleInputChange}
           className="input input-bordered w-full bg-base-200/50 rounded-xl text-sm"
         />
 
-        {/* Locked Profile Fields matching image footprint bottom */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-60">
           <input type="text" readOnly value={session?.user?.name || "vendor"} className="input input-bordered w-full bg-base-300 rounded-xl text-sm cursor-not-allowed" />
           <input type="text" readOnly value={session?.user?.email || "vendor@gmail.com"} className="input input-bordered w-full bg-base-300 rounded-xl text-sm cursor-not-allowed" />
         </div>
 
-        {/* Submission Execution Control Accent Button */}
         <button 
           type="submit" disabled={loading}
           className="btn w-full bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800 text-white font-bold border-none rounded-xl tracking-wide uppercase mt-4 shadow-md"
