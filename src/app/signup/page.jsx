@@ -49,7 +49,6 @@ export default function SignUpPage() {
 
     try {
       // 🟢 HARDCODED ADMIN PROVISIONING GUARD
-      // Set your chosen secret email and password keys below
       const SECRET_ADMIN_EMAIL = "superadmin@ticketbari.com";
       const SECRET_ADMIN_PASSWORD = "SecretAdminPassword123";
       const DEFAULT_ADMIN_IMAGE = "https://cdn.pixabay.com/photo/2023/06/02/15/39/ai-generated-8035975_1280.png";
@@ -64,7 +63,7 @@ export default function SignUpPage() {
         finalImage = DEFAULT_ADMIN_IMAGE;
       }
 
-      // BetterAuth Signup Core Request
+      // 1️⃣ BetterAuth Signup Core Request
       const { data, error } = await authClient.signUp.email({ 
         email: formData.email, 
         password: formData.password, 
@@ -78,6 +77,23 @@ export default function SignUpPage() {
 
       if (error) {
         throw new Error(error.message || "Authentication rejected by server database.");
+      }
+
+      // 2️⃣ ⚡ LIVE DATA SYNC PIPELINE: Push the profile into your MongoDB collection
+      try {
+        await fetch("http://localhost:7000/api/users/sync", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            name: finalName,
+            image: finalImage,
+          }),
+        });
+      } catch (syncError) {
+        console.error("Backend database sync failed, skipping gracefully:", syncError);
       }
 
       // Success Notification Handler
@@ -113,9 +129,9 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-6 bg-base-100 text-base-content overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-6 bg-[#010313] text-base-content overflow-hidden">
       {/* Background Tech Grids & Ambient Glows */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(var(--bc)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(var(--bc)/0.02)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
       <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-amber-500/[0.03] dark:bg-amber-500/[0.05] rounded-full blur-[100px] pointer-events-none" />
       
       <div className="relative z-10 max-w-md w-full bg-base-200/40 backdrop-blur-xl border border-base-content/10 p-8 rounded-3xl shadow-2xl">
@@ -161,7 +177,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          {/* 🟢 Choose System Access Role Dropdown (Admin option safely removed) */}
+          {/* 🟢 Choose System Access Role Dropdown */}
           <div className="form-control">
             <label className="label text-xs font-bold tracking-wide uppercase opacity-70 py-1">Select Profile Role</label>
             <div className="relative flex items-center">

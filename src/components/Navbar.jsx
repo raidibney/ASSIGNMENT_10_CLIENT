@@ -99,7 +99,7 @@ const Navbar = () => {
                 Home
               </Link>
               <Link 
-                href="/tickets" 
+                href="/all-tickets" 
                 className="px-5 py-2 rounded-full text-sm font-semibold tracking-wide transition-all text-base-content/70 hover:text-base-content hover:bg-base-300"
               >
                 All Tickets
@@ -227,7 +227,7 @@ const Navbar = () => {
                 <FaHome className="text-amber-500 text-sm" /> Home
               </Link>
               <Link 
-                href="/tickets" 
+                href="/all-tickets"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-base-200 text-base-content font-semibold"
               >

@@ -22,7 +22,7 @@ const AdvertisementSection = () => {
       } catch (err) {
         console.error("Failed loading active advertised dataset layout:", err);
       } finally {
-        loading && setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -172,8 +172,9 @@ const AdvertisementSection = () => {
 
                     {/* Call To Action Interactivity Link Container */}
                     <div className="w-full">
+                      {/* ⚡ FIXED PATHWAY REFERENCE FROM /tickets/ TO /all-tickets/ */}
                       <Link
-                        href={`/tickets/${ticket._id}`}
+                        href={`/all-tickets/${ticket._id}`}
                         className="relative overflow-hidden group/btn flex items-center justify-center gap-2 w-full py-3.5 px-4 bg-base-300 hover:bg-gradient-to-r hover:from-amber-400 hover:to-orange-500 rounded-xl border border-base-content/5 hover:border-transparent text-sm font-bold transition-all duration-300 tracking-wide text-base-content hover:text-slate-950 dark:hover:text-slate-950"
                       >
                         <span>See Details</span>

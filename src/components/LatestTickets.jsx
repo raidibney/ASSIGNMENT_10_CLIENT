@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaTrain, FaArrowRight, FaClock, FaCheckCircle, FaPlane, FaBus } from "react-icons/fa";
+import { FaTrain, FaArrowRight, FaClock, FaCheckCircle, FaPlane, FaBus, FaShip } from "react-icons/fa";
 
 const LatestTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -29,9 +29,10 @@ const LatestTickets = () => {
 
   // Helper utility function to render correct structural travel category icons dynamically
   const getTransportIcon = (type) => {
-    const checkType = type?.toLowerCase();
+    const checkType = type?.toLowerCase() || "";
     if (checkType === "flight" || checkType === "plane") return <FaPlane className="text-amber-500" />;
     if (checkType === "bus") return <FaBus className="text-amber-500" />;
+    if (checkType === "launch" || checkType === "ship" || checkType === "ferry") return <FaShip className="text-amber-500" />;
     return <FaTrain className="text-amber-500" />; // Fallback default icon
   };
 
@@ -130,8 +131,9 @@ const LatestTickets = () => {
                       </p>
                     </div>
 
+                    {/* ⚡ FIXED PATH MATRIX LOCATION FOR TARGET DETAILS VIEW */}
                     <Link
-                      href={`/tickets/${ticket._id}`}
+                      href={`/all-tickets/${ticket._id}`}
                       className="flex items-center justify-center w-10 h-10 rounded-xl bg-base-300 border border-base-content/5 text-base-content group-hover:bg-gradient-to-r group-hover:from-amber-400 group-hover:to-orange-500 group-hover:text-slate-950 group-hover:border-transparent transition-all duration-300"
                       aria-label="See Ticket Details"
                     >
