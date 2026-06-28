@@ -16,7 +16,7 @@ export default function SignUpPage() {
     imageUrl: "",
     password: "",
     confirmPassword: "",
-    role: "user", // 🟢 Default fallback role selection value
+    role: "user", // Default fallback role selection value
   });
   
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +48,7 @@ export default function SignUpPage() {
     const loadingToast = toast.loading("Processing credentials. Provisioning your profile node...");
 
     try {
-      // 🟢 HARDCODED ADMIN PROVISIONING GUARD
+      // HARDCODED ADMIN PROVISIONING GUARD
       const SECRET_ADMIN_EMAIL = "superadmin@ticketbari.com";
       const SECRET_ADMIN_PASSWORD = "SecretAdminPassword123";
       const DEFAULT_ADMIN_IMAGE = "https://cdn.pixabay.com/photo/2023/06/02/15/39/ai-generated-8035975_1280.png";
@@ -90,6 +90,7 @@ export default function SignUpPage() {
             email: formData.email,
             name: finalName,
             image: finalImage,
+            role: finalRole, // ✅ FIXED: Role parameter added here to stop saving vendors as standard users!
           }),
         });
       } catch (syncError) {
@@ -177,7 +178,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          {/* 🟢 Choose System Access Role Dropdown */}
+          {/* Choose System Access Role Dropdown */}
           <div className="form-control">
             <label className="label text-xs font-bold tracking-wide uppercase opacity-70 py-1">Select Profile Role</label>
             <div className="relative flex items-center">
