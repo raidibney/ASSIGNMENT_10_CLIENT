@@ -21,7 +21,6 @@ import {
 
 const BASE_API_URL = "http://localhost:7000/api";
 
-// --- LIVE COUNTDOWN COMPONENT ---
 const DepartureCountdown = ({ journeyDate }) => {
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
@@ -114,7 +113,8 @@ export default function TicketDetailsPage() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const authenticatedSessionEmail = "passenger.node@test.com"; 
+  // Aligned directly with your active database entry
+  const authenticatedSessionEmail = "modi@gmail.com"; 
 
   useEffect(() => {
     async function initializePagePipeline() {
@@ -146,22 +146,6 @@ export default function TicketDetailsPage() {
     try {
       setAuthLoading(true);
 
-      const derivedName = email
-        .split("@")[0]
-        .split(/[._-]/)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-
-      await fetch(`${BASE_API_URL}/users/sync`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          name: derivedName,
-          image: ""
-        })
-      });
-      
       const userListResponse = await fetch(`${BASE_API_URL}/users`);
       if (userListResponse.ok) {
         const usersArray = await userListResponse.json();
@@ -171,9 +155,7 @@ export default function TicketDetailsPage() {
           setCurrentUser({
             id: matchedProfileNode._id,
             email: matchedProfileNode.email,
-            name: matchedProfileNode.name && matchedProfileNode.name.toUpperCase() !== "ANONYMOUS USER" 
-              ? matchedProfileNode.name 
-              : derivedName,
+            name: matchedProfileNode.name,
             role: matchedProfileNode.role || "user"
           });
         }
@@ -188,8 +170,6 @@ export default function TicketDetailsPage() {
   const fetchTicketDetails = async () => {
     const response = await fetch(`${BASE_API_URL}/tickets/${id}`);
     if (!response.ok) {
-      const structuralFallbackText = await response.text();
-      console.error(`Fetch target error (${response.status}):`, structuralFallbackText);
       throw new Error("Target payload delivered non-JSON data segments.");
     }
     const data = await response.json();
@@ -203,7 +183,7 @@ export default function TicketDetailsPage() {
     }
 
     if (currentUser.role !== "user") {
-      toast.error(`Booking Blocked: Your assigned role is '${currentUser.role}'. Only users can buy.`); 
+      toast.error(`Booking Blocked: Your role is '${currentUser.role}'. Only users can buy.`); 
       return;
     }
 
@@ -229,21 +209,16 @@ export default function TicketDetailsPage() {
         }),
       });
 
-      const ContentTypeHeader = response.headers.get("content-type");
-      if (!ContentTypeHeader || !ContentTypeHeader.includes("application/json")) {
-        const clearTextPayload = await response.text();
-        throw new Error(`Server error: ${clearTextPayload}`);
-      }
-
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "The booking transaction failed.");
 
-      toast.success("Reservation securely saved in our registry!");
+      toast.success("Booking request sent to vendor dashboard successfully!");
       
       setTicket(prev => ({ ...prev, quantity: prev.quantity - selectedQuantity }));
       
       setTimeout(() => {
-        router.push("/my-bookings"); 
+        // Correct structural routing link to your primary dashboard page view
+        router.push("/dashboard"); 
       }, 1500);
 
     } catch (err) {
